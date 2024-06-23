@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Turkcell Final</string>
+    <string name="binding_is_null">Binding is null</string>
+    <string name="hello_blank_fragment">Hello Blank Fragment</string>
+    <string name="home">Home</string>
+    <string name="searchbar_hint">Search Anything...</string>
+    <string name="categories">Categories</string>
+    <string name="my_orders">My Orders</string>
+    <string name="overall_rating">Overall Rating</string>
+    <string name="rate">Rate</string>
+    <string name="description">Description</string>
+    <string name="favorites">Favorites</string>
+    <string name="orders">Orders</string>
+    <string name="cancel">Cancel</string>
+    <string name="track">Track</string>
+</resources>
