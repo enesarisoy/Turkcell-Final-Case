@@ -1,17 +1,19 @@
 package com.ns.turkcellfinal.presentation.category
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
-import com.bumptech.glide.Glide
 import com.ns.turkcellfinal.R
 import com.ns.turkcellfinal.core.base.BaseFragment
 import com.ns.turkcellfinal.core.base.BaseResponse
 import com.ns.turkcellfinal.core.domain.ViewState
+import com.ns.turkcellfinal.core.util.showToast
 import com.ns.turkcellfinal.data.model.category.CategoryItem
 import com.ns.turkcellfinal.databinding.FragmentCategoryBinding
 import com.ns.turkcellfinal.databinding.ItemCategoriesBinding
@@ -43,11 +45,10 @@ class CategoryFragment : BaseFragment<FragmentCategoryBinding>(
                 viewModel.categories.collect { response ->
                     when (response) {
                         is ViewState.Loading -> {
-                            // Handle loading
+                            Log.d("Loading", "Loading")
                         }
 
                         is ViewState.Success -> {
-                            // Handle success
                             val result = response.result as BaseResponse.Success
                             val data = result.data
 
@@ -55,7 +56,7 @@ class CategoryFragment : BaseFragment<FragmentCategoryBinding>(
                         }
 
                         is ViewState.Error -> {
-                            // Handle error
+                            requireContext().showToast(response.error)
                         }
                     }
                 }
@@ -100,7 +101,13 @@ class CategoryFragment : BaseFragment<FragmentCategoryBinding>(
                     val categoryImageMap = getCategoryImageMap()
 
                     categoryImageMap[category.name]?.let { drawableRes ->
-                        Glide.with(root).load(drawableRes).into(ivCategoryImage)
+                        ivCategoryImage.setImageDrawable(
+                            ResourcesCompat.getDrawable(
+                                resources,
+                                drawableRes,
+                                null
+                            )
+                        )
                     }
 
                     root.setOnClickListener {

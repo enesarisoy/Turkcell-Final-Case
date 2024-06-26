@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
     <application
         android:name=".core.app.TurkcellApp"
@@ -15,6 +17,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TurkcellFinal"
         tools:targetApi="31">
+        <service android:name=".core.service.MyFirebaseMessageService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"></action>
+            </intent-filter>
+        </service>
         <activity
             android:name=".MainActivity"
             android:exported="true">

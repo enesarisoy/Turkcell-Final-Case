@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.safeArgs)
     alias(libs.plugins.parcelize)
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -58,6 +59,8 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
+    implementation(libs.firebase.config)
+    implementation(libs.firebase.messaging)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -76,29 +79,37 @@ dependencies {
 
     implementation(libs.androidx.fragment.ktx)
 
+    // Retrofit
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
 
+    // Room
     implementation(libs.androidx.room.runtime)
     annotationProcessor(libs.androidx.room.compiler)
-
-    // To use Kotlin Symbol Processing (KSP)
     kapt(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
 
+    // Hilt
     implementation(libs.hilt.android)
     implementation(libs.hilt.navigation.compose)
     kapt(libs.hilt.android.compiler)
 
+    // OkHttp
     implementation(libs.okhttp.client)
 
+    // Glide
     implementation(libs.glide)
 
+    // ConcatAdapter
     implementation(libs.recyclerview)
 
     //Carousel
-    implementation ("me.relex:circleindicator:2.1.6")
-    implementation ("org.imaginativeworld.whynotimagecarousel:whynotimagecarousel:2.1.0")
+    implementation (libs.circleindicator)
+    implementation (libs.whynotimagecarousel)
+
+    // Lottie
+    implementation(libs.lottie)
+
 
 }
 // Allow references to generated code

@@ -1,16 +1,15 @@
 package com.ns.turkcellfinal.presentation.home
 
-import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -20,12 +19,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
-import com.google.android.material.chip.ChipGroup
 import com.ns.turkcellfinal.R
 import com.ns.turkcellfinal.core.base.BaseFragment
 import com.ns.turkcellfinal.core.base.BaseResponse
 import com.ns.turkcellfinal.core.domain.ViewState
 import com.ns.turkcellfinal.core.util.gone
+import com.ns.turkcellfinal.core.util.hideKeyboard
 import com.ns.turkcellfinal.core.util.showToast
 import com.ns.turkcellfinal.core.util.visible
 import com.ns.turkcellfinal.data.local.model.ProductEntity
@@ -35,9 +34,14 @@ import com.ns.turkcellfinal.databinding.ItemHomeCategoriesBinding
 import com.ns.turkcellfinal.databinding.ItemHomeSearchBinding
 import com.ns.turkcellfinal.databinding.ItemProductsBinding
 import com.ns.turkcellfinal.databinding.ItemProductsViewBinding
+import com.ns.turkcellfinal.presentation.account.UserManager
 import com.ns.turkcellfinal.presentation.adapter.SingleRecyclerAdapter
+import com.ns.turkcellfinal.presentation.home.util.Category
+import com.ns.turkcellfinal.presentation.home.util.dpToPx
+import com.ns.turkcellfinal.presentation.home.util.setCategoriesChips
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class HomeFragment : BaseFragment<FragmentHomeBinding>(
@@ -47,6 +51,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
     private val viewModel: HomeViewModel by viewModels()
     private val productsInFavorites = mutableListOf<ProductEntity>()
 
+    @Inject
+    lateinit var userManager: UserManager
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -56,7 +62,23 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
 
         getData()
 
+        checkQuantity()
+    }
 
+    private fun checkQuantity() {
+        with(binding.toolbar) {
+
+            viewModel.getTotalQuantity()
+            viewModel.totalQuantity.observe(viewLifecycleOwner) {
+                it?.let {
+                    tvBadge.visible()
+                    tvBadge.text = it.toString()
+                } ?: run {
+                    tvBadge.gone()
+                    "0"
+                }
+            }
+        }
     }
 
     private fun getData() {
@@ -99,6 +121,15 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
                         }
                     }
             }
+
+            val header = navView.getHeaderView(0)
+            val tvUserName = header.findViewById<TextView>(R.id.tvUserName)
+            val ivProfilePhoto = header.findViewById<ImageView>(R.id.ivProfilePhoto)
+
+            tvUserName.text = userManager.user?.username
+            Glide.with(requireContext())
+                .load(userManager.user?.image)
+                .into(ivProfilePhoto)
         }
     }
 
@@ -113,6 +144,74 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
             },
             { binding, _ ->
                 binding.apply {
+                    tlSearch.isEndIconVisible = false
+
+                    etSearch.addTextChangedListener(object : TextWatcher {
+                        override fun beforeTextChanged(
+                            s: CharSequence?,
+                            start: Int,
+                            count: Int,
+                            after: Int
+                        ) {
+                            // Do nothing
+                        }
+
+                        override fun onTextChanged(
+                            s: CharSequence?,
+                            start: Int,
+                            before: Int,
+                            count: Int
+                        ) {
+                            // Perform search when text changes
+                            if (s.isNullOrEmpty()) {
+                                tlSearch.isEndIconVisible = false
+                            } else {
+                                tlSearch.isEndIconVisible = true
+                                tlSearch.setEndIconOnClickListener {
+                                    etSearch.text?.clear()
+                                    etSearch.clearFocus()
+                                    requireView().hideKeyboard()
+                                }
+                            }
+                            s?.let {
+                                viewModel.searchProduct(it.toString())
+                            }
+                        }
+
+                        override fun afterTextChanged(s: Editable?) {
+                            // Do nothing
+
+                        }
+                    })
+
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        viewModel.products.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+                            .collect { response ->
+                                when (response) {
+                                    is ViewState.Loading -> {
+                                        Log.d("Loading", "Loading")
+                                    }
+
+                                    is ViewState.Success -> {
+                                        val result = response.result as BaseResponse.Success
+                                        val products = result.data.products
+                                        itemProductListingAdapter.data = products
+
+                                        products.forEach { product ->
+                                            productsInFavorites.forEach { productInFavorites ->
+                                                if (product.id == productInFavorites.id) {
+                                                    product.isLiked = true
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    is ViewState.Error -> {
+                                        requireContext().showToast(response.error)
+                                    }
+                                }
+                            }
+                    }
                 }
             }
         )
@@ -128,7 +227,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
             },
             { binding, _ ->
                 binding.apply {
-                    setCategoriesChips(binding)
+                    val list = setCategoriesChips(resources)
+                    addChips(binding, list)
+
                     tvViewAll.setOnClickListener {
                         findNavController().navigate(R.id.action_homeFragment_to_categoryFragment)
                     }
@@ -167,6 +268,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
             { binding, product ->
                 binding.apply {
                     Glide.with(root.context)
+
                         .load(product.thumbnail)
                         .into(ivProduct)
                     tvProductName.text = product.title
@@ -225,10 +327,15 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
             val drawable = GradientDrawable().apply {
                 shape = GradientDrawable.OVAL
                 setColor(category.color)
-                setSize(48.dpToPx(), 48.dpToPx())
+                setSize(48.dpToPx(resources), 48.dpToPx(resources))
             }
             chipIcon.background = drawable
-            chipIcon.setPadding(12.dpToPx(), 12.dpToPx(), 12.dpToPx(), 12.dpToPx())
+            chipIcon.setPadding(
+                12.dpToPx(resources),
+                12.dpToPx(resources),
+                12.dpToPx(resources),
+                12.dpToPx(resources)
+            )
 
             chip.setOnClickListener {
                 findNavController().navigate(
@@ -244,156 +351,18 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
     }
 
 
-    private fun setCategoriesChips(binding: ItemHomeCategoriesBinding) {
-        val categories = listOf(
-            Category(R.drawable.ic_beauty, "Beauty", Color.parseColor("#ECFDF5"), "beauty"),
-            Category(
-                R.drawable.ic_fragrances,
-                "Fragrances",
-                Color.parseColor("#FFEDED"),
-                "fragrances"
-            ),
-            Category(
-                R.drawable.ic_furniture,
-                "Furniture",
-                Color.parseColor("#ECFDF5"),
-                "furniture"
-            ),
-            Category(
-                R.drawable.ic_groceries,
-                "Groceries",
-                Color.parseColor("#FFF7ED"),
-                "groceries"
-            ),
-            Category(
-                R.drawable.ic_home_decoration,
-                "Home\nDecoration",
-                Color.parseColor("#FFF7ED"),
-                "home-decoration"
-            ),
-            Category(
-                R.drawable.ic_kitchen,
-                "Kitchen\nAccessories",
-                ResourcesCompat.getColor(resources, R.color.chip_gray_bg, null),
-                "kitchen-accessories"
-            ),
-            Category(
-                R.drawable.ic_laptop,
-                "Laptops",
-                ResourcesCompat.getColor(resources, R.color.chip_orange_bg, null),
-                "laptops"
-            ),
-            Category(
-                R.drawable.ic_mens_shirt,
-                "Men's\nShirts",
-                ResourcesCompat.getColor(resources, R.color.chip_blue_bg, null),
-                "mens-shirts"
-            ),
-            Category(
-                R.drawable.ic_men_watch,
-                "Men's\nWatches",
-                ResourcesCompat.getColor(resources, R.color.chip_blue_bg, null),
-                "mens-watches"
-            ),
-            Category(
-                R.drawable.ic_mobile_accessories,
-                "Mobile\nAccessories",
-                ResourcesCompat.getColor(resources, R.color.chip_gray_bg, null),
-                "mobile-accessories"
-            ),
-            Category(
-                R.drawable.ic_motorcycle,
-                "Motorcycle",
-                ResourcesCompat.getColor(resources, R.color.chip_green_bg, null),
-                "motorcycle"
-            ),
-            Category(
-                R.drawable.ic_skin_care,
-                "Skin\nCare",
-                ResourcesCompat.getColor(resources, R.color.chip_orange_bg, null),
-                "skin-care"
-            ),
-            Category(
-                R.drawable.ic_smartphone,
-                "Smartphones",
-                ResourcesCompat.getColor(resources, R.color.chip_gray_bg, null),
-                "smartphones"
-            ),
-            Category(
-                R.drawable.ic_sport,
-                "Sports\nAccessories",
-                ResourcesCompat.getColor(resources, R.color.chip_green_bg, null),
-                "sports-accessories"
-            ),
-            Category(
-                R.drawable.ic_sunglasses,
-                "Sunglasses",
-                ResourcesCompat.getColor(resources, R.color.chip_gray_bg, null),
-                "sunglasses"
-            ),
-            Category(
-                R.drawable.ic_tablet,
-                "Tablets",
-                ResourcesCompat.getColor(resources, R.color.chip_green_bg, null),
-                "tablets"
-            ),
-            Category(
-                R.drawable.ic_tops,
-                "Tops",
-                ResourcesCompat.getColor(resources, R.color.chip_blue_bg, null),
-                "tops"
-            ),
-            Category(
-                R.drawable.ic_vehicle,
-                "Vehicle",
-                ResourcesCompat.getColor(resources, R.color.chip_green_bg, null),
-                "vehicle"
-            ),
-            Category(
-                R.drawable.ic_women_bags,
-                "Women's\nBags",
-                ResourcesCompat.getColor(resources, R.color.chip_red_bg, null),
-                "womens-bags"
-            ),
-            Category(
-                R.drawable.ic_tops,
-                "Women's\nDresses",
-                ResourcesCompat.getColor(resources, R.color.chip_green_bg, null),
-                "womens-dresses"
-            ),
-            Category(
-                R.drawable.ic_jewellery,
-                "Women's\nJewellery",
-                ResourcesCompat.getColor(resources, R.color.chip_yellow_bg, null),
-                "womens-jewellery"
-            ),
-            Category(
-                R.drawable.ic_women_shoes,
-                "Women's\nShoes",
-                ResourcesCompat.getColor(resources, R.color.chip_red_bg, null),
-                "womens-shoes"
-            ),
-            Category(
-                R.drawable.ic_watch_women,
-                "Women's\nWatches",
-                ResourcesCompat.getColor(resources, R.color.chip_orange_bg, null),
-                "womens-watches"
-            )
-        )
-        addChips(binding, categories)
-    }
-
-
-    data class Category(val iconResId: Int, val text: String, val color: Int, val slug: String)
-
-    private fun Int.dpToPx(): Int {
-        return (this * resources.displayMetrics.density).toInt()
-    }
-
     private fun initClick() {
         with(binding) {
             toolbar.ivHamburgerMenu.setOnClickListener {
                 drawerLayout.openDrawer(GravityCompat.START)
+            }
+
+            toolbar.ivCart.setOnClickListener {
+                findNavController().navigate(R.id.action_homeFragment_to_cartFragment)
+            }
+
+            toolbar.ivNotification.setOnClickListener {
+                requireContext().showToast("Coming soon")
             }
 
             navView.setNavigationItemSelectedListener { menuItem ->
@@ -415,12 +384,24 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
                         drawerLayout.closeDrawers()
                     }
 
+                    R.id.nav_logout -> {
+                        userManager.clearUser()
+                        findNavController().navigate(R.id.action_homeFragment_to_loginFragment)
+                        drawerLayout.closeDrawers()
+                    }
+
                     else -> {
                         requireContext().showToast("Coming soon")
                     }
                 }
                 drawerLayout.closeDrawers()
                 true
+            }
+
+            val headerView = navView.getHeaderView(0)
+            headerView.setOnClickListener {
+                findNavController().navigate(R.id.action_homeFragment_to_profileFragment)
+                drawerLayout.closeDrawers()
             }
 
         }

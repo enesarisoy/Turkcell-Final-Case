@@ -16,7 +16,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
@@ -68,15 +67,17 @@ class ProductRepositoryImpl @Inject constructor(
         awaitClose { close() }
     }.flowOn(ioDispatcher)
 
-    override fun login(username: String, password: String): Flow<LoginResponse> = flow {
-        val request = LoginRequest(username, password)
-        val response = apiService.login(request).execute()
-        if (response.isSuccessful) {
-            response.body()?.let {
-                emit(it)
-            }
-        } else {
-            throw Exception("Login failed")
-        }
-    }
+    override fun login(username: String, password: String): Flow<BaseResponse<LoginResponse>> =
+        callbackFlow<BaseResponse<LoginResponse>> {
+            val request = LoginRequest(username, password)
+            apiService.login(request)
+                .enqueue(Callback(this.channel))
+            awaitClose { close() }
+        }.flowOn(ioDispatcher)
+
+    override fun getUserInfo(token: String): Flow<BaseResponse<LoginResponse>> = callbackFlow {
+        apiService.getUserInfo("Bearer $token")
+            .enqueue(Callback(this.channel))
+        awaitClose { close() }
+    }.flowOn(ioDispatcher)
 }

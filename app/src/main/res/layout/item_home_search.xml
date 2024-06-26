@@ -12,6 +12,8 @@
         android:layout_marginHorizontal="@dimen/margin_medium"
         android:layout_marginVertical="@dimen/margin_medium"
         app:boxCornerRadiusBottomEnd="12dp"
+        app:endIconMode="custom"
+        app:endIconDrawable="@drawable/baseline_close_24"
         app:boxCornerRadiusBottomStart="12dp"
         app:boxCornerRadiusTopEnd="12dp"
         app:boxCornerRadiusTopStart="12dp"
@@ -27,7 +29,7 @@
             android:layout_height="wrap_content"
             android:drawablePadding="@dimen/margin_medium"
             android:hint="@string/searchbar_hint"
-            android:textColor="@color/textHintColor" />
+            android:textColor="@color/textColor" />
     </com.google.android.material.textfield.TextInputLayout>
 
 

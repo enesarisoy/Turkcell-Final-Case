@@ -10,11 +10,11 @@ import com.ns.turkcellfinal.data.local.model.ProductEntity
 import com.ns.turkcellfinal.data.mapper.toProductEntity
 import com.ns.turkcellfinal.data.model.product.Product
 import com.ns.turkcellfinal.data.model.product.ProductResponse
-import com.ns.turkcellfinal.domain.usecase.GetProductByCategoryUseCase
-import com.ns.turkcellfinal.domain.usecase.SearchProductUseCase
-import com.ns.turkcellfinal.domain.usecase.local.AddToFavoritesUseCase
-import com.ns.turkcellfinal.domain.usecase.local.DeleteFromFavoritesUseCase
-import com.ns.turkcellfinal.domain.usecase.local.GetProductsFromFavoritesUseCase
+import com.ns.turkcellfinal.domain.usecase.local.favorites.AddToFavoritesUseCase
+import com.ns.turkcellfinal.domain.usecase.local.favorites.DeleteFromFavoritesUseCase
+import com.ns.turkcellfinal.domain.usecase.local.favorites.GetProductsFromFavoritesUseCase
+import com.ns.turkcellfinal.domain.usecase.remote.product.GetProductByCategoryUseCase
+import com.ns.turkcellfinal.domain.usecase.remote.product.SearchProductUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

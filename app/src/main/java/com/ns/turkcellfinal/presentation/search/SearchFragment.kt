@@ -1,6 +1,7 @@
 package com.ns.turkcellfinal.presentation.search
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.activityViewModels
@@ -164,7 +165,7 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(
                     }
 
                     is ViewState.Loading -> {
-                        // Handle loading state
+                        Log.d("Loading", "Loading")
                     }
                 }
             }

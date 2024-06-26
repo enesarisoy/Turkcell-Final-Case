@@ -21,12 +21,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:src="@drawable/ic_arrow_right" />
+            android:src="@drawable/baseline_done_24"
+            app:tint="@color/blue_stroke" />
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/margin_small"
+            android:layout_marginHorizontal="@dimen/margin_medium"
             android:layout_weight="1"
             android:orientation="vertical">
 

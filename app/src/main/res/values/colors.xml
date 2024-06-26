@@ -18,4 +18,12 @@
     <color name="discount_color">#EA580C</color>
 
     <color name="mtrl_textinput_default_box_stroke_color" tools:override="true">#D1D5DB</color>
+    <color name="remove_color">#DF3A3A</color>
+    <color name="blue_stroke">#1D4ED8</color>
+    <color name="snackbar_color">#111827</color>
+
+    <color name="tl_border_color">#666E6969</color>
+
+    <color name="disabled">#B5C0D0</color>
+    <color name="disabled_text">#ff37474f</color>
 </resources>

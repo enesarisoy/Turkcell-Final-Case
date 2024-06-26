@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.ns.turkcellfinal.core.base.BaseResponse
 import com.ns.turkcellfinal.core.domain.ViewState
 import com.ns.turkcellfinal.data.model.carts.CartsResponse
-import com.ns.turkcellfinal.domain.usecase.GetOrdersUseCase
+import com.ns.turkcellfinal.domain.usecase.remote.product.GetOrdersUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

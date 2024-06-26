@@ -4,7 +4,16 @@
     <style name="TextInputLayoutStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
         <item name="boxStrokeColor">#D1D5DB</item>
         <item name="boxStrokeWidth">1.2dp</item>
-        <item name="hintEnabled">false</item>
+        <item name="backgroundTint">#ffffff</item>
+        <item name="hintTextColor">@color/textGray</item>
+        <item name="cursorColor">@color/textGray</item>
+        <item name="android:cursorVisible">true</item>
+    </style>
+
+    <style name="TextInputLayoutStyleProfile" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/tl_border_color</item>
+        <item name="boxStrokeWidth">1dp</item>
+        <item name="hintTextColor">@color/textGray</item>
         <item name="backgroundTint">#ffffff</item>
     </style>
 
@@ -24,4 +33,9 @@
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
     </style>
+
+    <style name="CustomAlertDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:windowBackground">@drawable/alert_dialog_rounded_corner</item>
+    </style>
+
 </resources>

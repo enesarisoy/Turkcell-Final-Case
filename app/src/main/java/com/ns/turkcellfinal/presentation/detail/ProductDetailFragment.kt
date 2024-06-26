@@ -1,20 +1,14 @@
 package com.ns.turkcellfinal.presentation.detail
 
 import android.annotation.SuppressLint
-import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
 import android.util.TypedValue
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -26,13 +20,16 @@ import com.ns.turkcellfinal.core.base.BaseFragment
 import com.ns.turkcellfinal.core.base.BaseResponse
 import com.ns.turkcellfinal.core.domain.ViewState
 import com.ns.turkcellfinal.core.util.formatDate
+import com.ns.turkcellfinal.core.util.gone
+import com.ns.turkcellfinal.core.util.showSnackbar
 import com.ns.turkcellfinal.core.util.showStrikeThrough
 import com.ns.turkcellfinal.core.util.showToast
+import com.ns.turkcellfinal.core.util.visible
 import com.ns.turkcellfinal.data.model.product.Product
 import com.ns.turkcellfinal.databinding.FragmentProductDetailBinding
+import com.ns.turkcellfinal.presentation.core.calculatePrice
 import kotlinx.coroutines.launch
 import org.imaginativeworld.whynotimagecarousel.model.CarouselItem
-import org.imaginativeworld.whynotimagecarousel.model.CarouselType
 
 class ProductDetailFragment : BaseFragment<FragmentProductDetailBinding>(
     FragmentProductDetailBinding::inflate
@@ -40,13 +37,13 @@ class ProductDetailFragment : BaseFragment<FragmentProductDetailBinding>(
 
     private val args: ProductDetailFragmentArgs by navArgs()
     private val viewModel: ProductDetailViewModel by activityViewModels()
+    private lateinit var product: Product
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         initClick()
 
-        // TODO Rating Reviews Screen
         args.product?.let {
             showData(it)
             getData(it)
@@ -58,29 +55,48 @@ class ProductDetailFragment : BaseFragment<FragmentProductDetailBinding>(
                         is ViewState.Success -> {
                             val result = response.result as BaseResponse.Success
                             val data = result.data
+                            product = data
+                            binding.progressBar.gone()
                             showData(data)
                             getData(data)
                         }
 
                         is ViewState.Error -> {
+                            binding.progressBar.gone()
                             requireContext().showToast(response.error)
                         }
 
                         ViewState.Loading -> {
-
+                            binding.progressBar.visible()
                         }
                     }
                 }
             }
         }
 
+        getTotalQuantity()
+
+
+    }
+
+    private fun getTotalQuantity() {
+        viewModel.getTotalQuantity()
+        viewModel.totalQuantity.observe(viewLifecycleOwner) {
+            it?.let {
+                binding.toolbar.tvBadge.visible()
+                binding.toolbar.tvBadge.text = it.toString()
+            } ?: run {
+                binding.toolbar.tvBadge.gone()
+                "0"
+            }
+        }
     }
 
     private fun getData(product: Product) {
         with(binding) {
-            val sa = viewModel.checkProductIsFavorite(product.id)
+            val favorite = viewModel.checkProductIsFavorite(product.id)
             viewLifecycleOwner.lifecycleScope.launch {
-                sa.collect { isFavorite ->
+                favorite.collect { isFavorite ->
                     if (isFavorite) {
                         toolbar.ivLike.setImageDrawable(
                             ContextCompat.getDrawable(
@@ -107,10 +123,111 @@ class ProductDetailFragment : BaseFragment<FragmentProductDetailBinding>(
 
                     }
                 }
+            }
+        }
+    }
 
+
+    private fun initClick() {
+        with(binding) {
+            toolbar.ivBack.setOnClickListener {
+                findNavController().navigateUp()
             }
 
+            toolbar.ivShare.setOnClickListener {
+                requireContext().showToast("Not yet implemented..")
+            }
 
+            btnBuyNow.setOnClickListener {
+                viewModel.buyProduct()
+                viewLifecycleOwner.lifecycleScope.launch {
+                    viewModel.buyProduct.collect { response ->
+                        when (response) {
+                            is ViewState.Success -> {
+                                val result = response.result as BaseResponse.Success
+                                val data = result.data
+                                requireContext().showToast("Product bought successfully..")
+                            }
+
+                            is ViewState.Error -> {
+                                requireContext().showToast(response.error)
+                            }
+
+                            ViewState.Loading -> {
+
+                            }
+                        }
+                    }
+                }
+            }
+
+            btnAddToCart.setOnClickListener {
+                viewModel.addToCart(args.product ?: product)
+                getTotalQuantity()
+                requireView().showSnackbar("Product added to cart..")
+            }
+
+            btnRate.setOnClickListener {
+                requireContext().showToast("Not yet implemented..")
+            }
+
+            toolbar.ivCart.setOnClickListener {
+                findNavController().navigate(
+                    R.id.action_productDetailFragment_to_cartFragment
+                )
+            }
+        }
+    }
+
+    @SuppressLint("DefaultLocale")
+    private fun showData(product: Product) {
+        with(binding) {
+
+            tvDiscountPrice.showStrikeThrough(true)
+            tvProductName.text = product.title
+            tvProductPrice.text = "$${product.price}"
+            tvRating.text = product.rating.toString()
+            tvReviewsCount.text = "${product.reviews?.size} Reviews"
+            tvBrandName.text = product.brand
+            tvDescription.text = product.description
+
+            val discountPrice = product.calculatePrice()
+
+            tvDiscountPrice.text = discountPrice.let { "$${it}" }
+            tvDiscountPercent.text = product.discountPercentage?.let { "${it}% OFF" }
+
+            val rating = product.rating.toString().take(3)
+            tvRating2.text = rating
+
+            tvRatingsCount.text = "${product.reviews?.size} Ratings"
+            tvViewAllReviews.text = "View all ${product.reviews?.size} reviews"
+
+            product.reviews?.maxByOrNull {
+                it.rating
+            }?.let { review ->
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    tvReviewerName.text = "${review.reviewerName}, ${review.date.formatDate()}"
+                } else {
+                    tvReviewerName.text = "${review.reviewerName}"
+                }
+
+                tvReviewTitle.text = review.comment
+                addStarsToLayout(review.rating.toFloat())
+            }
+
+            carouselView.registerLifecycle(lifecycle)
+
+            carouselView.setData(product.images?.map { imageUrl ->
+                Glide.with(requireContext())
+                    .load(imageUrl)
+                    .apply(RequestOptions().placeholder(R.drawable.ic_placeholder))
+                    .preload()
+
+                CarouselItem(
+                    imageUrl = imageUrl
+                )
+            } ?: emptyList())
         }
     }
 
@@ -152,95 +269,4 @@ class ProductDetailFragment : BaseFragment<FragmentProductDetailBinding>(
         return imageView
     }
 
-    private fun initClick() {
-        with(binding) {
-            toolbar.ivBack.setOnClickListener {
-                findNavController().navigateUp()
-            }
-
-            toolbar.ivShare.setOnClickListener {
-                // TODO
-                requireContext().showToast("Not yet implemented..")
-            }
-
-            btnBuyNow.setOnClickListener {
-                viewModel.buyProduct()
-                viewLifecycleOwner.lifecycleScope.launch {
-                    viewModel.buyProduct.collect { response ->
-                        when (response) {
-                            is ViewState.Success -> {
-                                val result = response.result as BaseResponse.Success
-                                val data = result.data
-                                requireContext().showToast("Product bought successfully..")
-                            }
-
-                            is ViewState.Error -> {
-                                requireContext().showToast(response.error)
-                            }
-
-                            ViewState.Loading -> {
-
-                            }
-                        }
-                    }
-
-            }
-        }
-    }
-        }
-
-    @SuppressLint("DefaultLocale")
-    private fun showData(product: Product) {
-        with(binding) {
-
-            tvDiscountPrice.showStrikeThrough(true)
-            tvProductName.text = product.title
-            tvProductPrice.text = "$${product.price}"
-            tvRating.text = product.rating.toString()
-            tvReviewsCount.text = "${product.reviews?.size} Reviews"
-            tvBrandName.text = product.brand
-            tvDescription.text = product.description
-
-            val discountPrice = product.discountPercentage?.let {
-                val calculatedPrice =
-                    product.price?.plus((product.price * it / 100)) ?: product.price
-                String.format("%.2f", calculatedPrice)
-            }
-
-            tvDiscountPrice.text = discountPrice?.let { "$${it}" }
-            tvDiscountPercent.text = product.discountPercentage?.let { "${it}% OFF" }
-
-            val rating = product.rating.toString().take(3)
-            tvRating2.text = rating
-
-            tvRatingsCount.text = "${product.reviews?.size} Ratings"
-            tvViewAllReviews.text = "View all ${product.reviews?.size} reviews"
-
-            product.reviews?.maxByOrNull {
-                it.rating
-            }?.let { review ->
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    tvReviewerName.text = "${review.reviewerName}, ${review.date.formatDate()}"
-                } else {
-                    tvReviewerName.text = "${review.reviewerName}"
-                }
-
-                tvReviewTitle.text = review.comment
-                addStarsToLayout(review.rating.toFloat())
-            }
-
-            carouselView.registerLifecycle(lifecycle)
-
-            carouselView.setData(product.images?.map { imageUrl ->
-                Glide.with(requireContext())
-                    .load(imageUrl)
-                    .apply(RequestOptions().placeholder(R.drawable.ic_placeholder))
-                    .preload()
-
-                CarouselItem(
-                    imageUrl = imageUrl
-                )
-            } ?: emptyList())
-        }
-    }
 }

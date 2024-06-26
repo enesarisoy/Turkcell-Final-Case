@@ -42,21 +42,6 @@
             app:autoSizeMaxTextSize="20sp"
             app:autoSizeMinTextSize="16sp" />
 
-        <ImageView
-            android:id="@+id/ivSearch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="3dp"
-            android:src="@drawable/ic_search" />
-
-        <ImageView
-            android:id="@+id/ivCart"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:padding="3dp"
-            android:src="@drawable/ic_cart" />
-
     </LinearLayout>
 
 </Toolbar>

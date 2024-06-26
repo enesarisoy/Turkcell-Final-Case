@@ -1,0 +1,10 @@
+package com.ns.turkcellfinal.domain.usecase.remote.product
+
+import com.ns.turkcellfinal.domain.repository.ProductRepository
+import javax.inject.Inject
+
+class GetCategoriesUseCase @Inject constructor(
+    private val productRepository: ProductRepository
+) {
+    operator fun invoke() = productRepository.getCategories()
+}

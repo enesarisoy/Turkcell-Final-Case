@@ -1,5 +1,9 @@
 package com.ns.turkcellfinal.data.model.login
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class LoginResponse(
     val email: String,
     val firstName: String,
@@ -10,7 +14,7 @@ data class LoginResponse(
     val refreshToken: String,
     val token: String,
     val username: String
-)
+): Parcelable
 
 
 data class LoginRequest(

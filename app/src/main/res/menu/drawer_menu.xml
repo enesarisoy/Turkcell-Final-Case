@@ -15,4 +15,9 @@
         android:id="@+id/nav_favorites"
         android:icon="@drawable/ic_like_outline"
         android:title="@string/favorites" />
+
+    <item
+        android:id="@+id/nav_logout"
+        android:icon="@drawable/ic_logout"
+        android:title="@string/logout" />
 </menu>

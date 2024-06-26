@@ -46,6 +46,16 @@
                 android:layout_height="wrap_content"
                 app:layout_dodgeInsetEdges="top">
 
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
                 <org.imaginativeworld.whynotimagecarousel.ImageCarousel
                     android:id="@+id/carouselView"
                     android:layout_width="match_parent"
@@ -418,9 +428,9 @@
             android:backgroundTint="@color/white"
             android:fontFamily="@font/inter_medium"
             android:text="Add to Cart"
-            android:textColor="#1D4ED8"
+            android:textColor="@color/blue_stroke"
             app:cornerRadius="10dp"
-            app:strokeColor="#1D4ED8"
+            app:strokeColor="@color/blue_stroke"
             app:strokeWidth="1dp" />
 
         <com.google.android.material.button.MaterialButton
@@ -429,7 +439,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_medium"
             android:layout_weight="1"
-            android:backgroundTint="#1D4ED8"
+            android:backgroundTint="@color/blue_stroke"
             android:fontFamily="@font/inter_medium"
             android:text="Buy Now"
             android:textColor="@color/white"

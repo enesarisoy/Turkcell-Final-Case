@@ -10,6 +10,7 @@ import com.ns.turkcellfinal.data.model.product.ProductResponse
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -22,7 +23,7 @@ interface ApiService {
     @GET("products/categories")
     fun getCategories(): Call<CategoryResponse>
 
-    @GET("search")
+    @GET("products/search")
     fun searchProduct(
         @Query("q") query: String
     ): Call<ProductResponse>
@@ -46,5 +47,10 @@ interface ApiService {
     @POST("auth/login")
     fun login(
         @Body loginRequest: LoginRequest
+    ): Call<LoginResponse>
+
+    @GET("auth/me")
+    fun getUserInfo(
+        @Header("Authorization") token: String
     ): Call<LoginResponse>
 }

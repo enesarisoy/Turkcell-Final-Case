@@ -10,7 +10,7 @@
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toTopOf="parent">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginVertical="17dp"
@@ -22,8 +22,11 @@
             android:id="@+id/ivHamburgerMenu"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="3dp"
-            android:src="@drawable/ic_hamburger_menu" />
+            android:padding="8dp"
+            android:src="@drawable/ic_hamburger_menu"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:layout_width="0dp"
@@ -31,26 +34,50 @@
             android:layout_marginHorizontal="16dp"
             android:layout_weight="1"
             android:fontFamily="@font/inter_medium"
-            android:padding="3dp"
+            android:padding="8dp"
             android:text="@string/home"
             android:textColor="@color/textColor"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/ivHamburgerMenu"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/ivNotification"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="3dp"
-            android:src="@drawable/ic_notification" />
+            android:layout_marginHorizontal="16dp"
+            android:padding="8dp"
+            android:src="@drawable/ic_notification"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/ivCart"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/ivCart"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
-            android:padding="3dp"
-            android:src="@drawable/ic_cart" />
+            android:padding="8dp"
+            android:src="@drawable/ic_cart"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvBadge"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginTop="-20dp"
+            android:background="@drawable/badge_background"
+            android:gravity="center"
+            android:text="1"
+            android:textColor="@android:color/white"
+            android:textSize="12sp"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="@id/ivCart"
+            app:layout_constraintTop_toBottomOf="@id/ivCart" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </Toolbar>

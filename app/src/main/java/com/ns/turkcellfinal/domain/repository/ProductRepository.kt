@@ -4,7 +4,6 @@ import com.ns.turkcellfinal.core.base.BaseResponse
 import com.ns.turkcellfinal.data.model.buy.BuyResponse
 import com.ns.turkcellfinal.data.model.carts.CartsResponse
 import com.ns.turkcellfinal.data.model.category.CategoryResponse
-import com.ns.turkcellfinal.data.model.login.LoginRequest
 import com.ns.turkcellfinal.data.model.login.LoginResponse
 import com.ns.turkcellfinal.data.model.product.Product
 import com.ns.turkcellfinal.data.model.product.ProductResponse
@@ -25,5 +24,7 @@ interface ProductRepository {
 
     fun buyProduct(): Flow<BaseResponse<BuyResponse>>
 
-    fun login(username: String, password: String): Flow<LoginResponse>
+    fun login(username: String, password: String): Flow<BaseResponse<LoginResponse>>
+
+    fun getUserInfo(token: String): Flow<BaseResponse<LoginResponse>>
 }

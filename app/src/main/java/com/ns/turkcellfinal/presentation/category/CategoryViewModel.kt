@@ -1,12 +1,11 @@
 package com.ns.turkcellfinal.presentation.category
 
-import android.view.View
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ns.turkcellfinal.core.base.BaseResponse
 import com.ns.turkcellfinal.core.domain.ViewState
 import com.ns.turkcellfinal.data.model.category.CategoryResponse
-import com.ns.turkcellfinal.domain.usecase.GetCategoriesUseCase
+import com.ns.turkcellfinal.domain.usecase.remote.product.GetCategoriesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

@@ -10,14 +10,14 @@ import com.ns.turkcellfinal.data.local.model.ProductEntity
 import com.ns.turkcellfinal.data.mapper.toProductEntity
 import com.ns.turkcellfinal.data.model.product.Product
 import com.ns.turkcellfinal.data.model.product.ProductResponse
-import com.ns.turkcellfinal.domain.usecase.GetProductsUseCase
-import com.ns.turkcellfinal.domain.usecase.local.AddToFavoritesUseCase
-import com.ns.turkcellfinal.domain.usecase.local.DeleteFromFavoritesUseCase
-import com.ns.turkcellfinal.domain.usecase.local.GetProductsFromFavoritesUseCase
+import com.ns.turkcellfinal.domain.usecase.local.cart.GetTotalQuantityUseCase
+import com.ns.turkcellfinal.domain.usecase.local.favorites.AddToFavoritesUseCase
+import com.ns.turkcellfinal.domain.usecase.local.favorites.DeleteFromFavoritesUseCase
+import com.ns.turkcellfinal.domain.usecase.local.favorites.GetProductsFromFavoritesUseCase
+import com.ns.turkcellfinal.domain.usecase.remote.product.GetProductsUseCase
+import com.ns.turkcellfinal.domain.usecase.remote.product.SearchProductUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -30,7 +30,9 @@ class HomeViewModel @Inject constructor(
     private val getProductsUseCase: GetProductsUseCase,
     private val addToFavoritesUseCase: AddToFavoritesUseCase,
     private val getProductsFromFavoritesUseCase: GetProductsFromFavoritesUseCase,
-    private val deleteFromFavoritesUseCase: DeleteFromFavoritesUseCase
+    private val deleteFromFavoritesUseCase: DeleteFromFavoritesUseCase,
+    private val searchProductUseCase: SearchProductUseCase,
+    private val getTotalQuantityUseCase: GetTotalQuantityUseCase
 ) : ViewModel() {
 
     private var _products: MutableStateFlow<ViewState<BaseResponse<ProductResponse>>> =
@@ -39,6 +41,10 @@ class HomeViewModel @Inject constructor(
 
     private val _productsFromFavorites = MutableLiveData<List<ProductEntity>>()
     val productsFromFavorites: LiveData<List<ProductEntity>> get() = _productsFromFavorites
+
+    private var _totalQuantity: MutableLiveData<Int?> = MutableLiveData(0)
+    val totalQuantity: LiveData<Int?>
+        get() = _totalQuantity
 
     fun getProducts() {
         viewModelScope.launch {
@@ -65,7 +71,23 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun searchProduct(query: String) {
+        viewModelScope.launch {
+            searchProductUseCase(query).map { response ->
+                when (response) {
+                    is BaseResponse.Success -> {
+                        ViewState.Success(response)
+                    }
 
+                    is BaseResponse.Error -> {
+                        ViewState.Error(response.message)
+                    }
+                }
+            }.onEach { data ->
+                _products.emit(data)
+            }.launchIn(viewModelScope)
+        }
+    }
 
     fun getProductsFromFavorites() {
         viewModelScope.launch {
@@ -74,6 +96,7 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
+
     fun addToFavorites(product: Product) {
         val entity = product.toProductEntity()
         viewModelScope.launch {
@@ -87,4 +110,10 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun getTotalQuantity() {
+        viewModelScope.launch {
+            val totalQuantity = getTotalQuantityUseCase()
+            _totalQuantity.value = totalQuantity
+        }
+    }
 }

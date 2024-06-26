@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:elevation="4dp"
     android:background="@android:color/transparent"
+    android:elevation="4dp"
     android:padding="@dimen/margin_small">
 
     <ImageView
@@ -13,48 +13,58 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_medium"
-        android:layout_marginTop="@dimen/margin_medium"
         android:background="@drawable/item_nav_bg"
         android:padding="8dp"
         android:src="@drawable/ic_back"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
-        android:id="@+id/llNav"
+
+    <ImageView
+        android:id="@+id/ivLike"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_medium"
-        android:orientation="horizontal"
+        android:layout_marginEnd="@dimen/margin_medium"
+        android:background="@drawable/item_nav_bg"
+        android:padding="8dp"
+        android:src="@drawable/ic_like_outline"
+        app:layout_constraintEnd_toStartOf="@id/ivShare"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/ivShare"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/margin_medium"
+        android:background="@drawable/item_nav_bg"
+        android:padding="8dp"
+        android:src="@drawable/ic_share"
+        app:layout_constraintEnd_toStartOf="@id/ivCart"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/ivCart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/margin_medium"
+        android:background="@drawable/item_nav_bg"
+        android:padding="8dp"
+        android:src="@drawable/ic_cart"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:id="@+id/ivLike"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/margin_medium"
-            android:background="@drawable/item_nav_bg"
-            android:padding="8dp"
-            android:src="@drawable/ic_like_outline" />
+    <TextView
+        android:id="@+id/tvBadge"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginTop="-20dp"
+        android:background="@drawable/badge_background"
+        android:gravity="center"
+        android:text="1"
+        android:textColor="@android:color/white"
+        android:textSize="12sp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="@id/ivCart"
+        app:layout_constraintTop_toBottomOf="@id/ivCart" />
 
-        <ImageView
-            android:id="@+id/ivShare"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/margin_medium"
-            android:background="@drawable/item_nav_bg"
-            android:padding="8dp"
-            android:src="@drawable/ic_share" />
-
-        <ImageView
-            android:id="@+id/ivCart"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/margin_medium"
-            android:background="@drawable/item_nav_bg"
-            android:padding="8dp"
-            android:src="@drawable/ic_cart" />
-
-    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.transition.TransitionManager
@@ -33,12 +34,20 @@ class OrdersFragment : BaseFragment<FragmentOrdersBinding>(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        initClick()
         initListener()
         initAdapters()
 
         getData()
     }
 
+    private fun initClick() {
+        with(binding) {
+            toolbarOrders.root.setNavigationOnClickListener {
+                findNavController().navigateUp()
+            }
+        }
+    }
 
     private fun getData() {
         with(binding) {

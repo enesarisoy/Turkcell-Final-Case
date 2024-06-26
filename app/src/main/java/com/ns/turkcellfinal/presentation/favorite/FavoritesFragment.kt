@@ -2,10 +2,7 @@ package com.ns.turkcellfinal.presentation.favorite
 
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -16,14 +13,12 @@ import com.ns.turkcellfinal.R
 import com.ns.turkcellfinal.core.base.BaseFragment
 import com.ns.turkcellfinal.core.base.BaseResponse
 import com.ns.turkcellfinal.core.domain.ViewState
+import com.ns.turkcellfinal.core.util.showToast
 import com.ns.turkcellfinal.data.local.model.ProductEntity
-import com.ns.turkcellfinal.data.mapper.toProduct
-import com.ns.turkcellfinal.data.model.product.Product
 import com.ns.turkcellfinal.databinding.FragmentFavoritesBinding
 import com.ns.turkcellfinal.databinding.ItemProductsBinding
 import com.ns.turkcellfinal.databinding.ItemProductsViewBinding
 import com.ns.turkcellfinal.presentation.adapter.SingleRecyclerAdapter
-import com.ns.turkcellfinal.presentation.search.SearchFragmentDirections
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -51,6 +46,7 @@ class FavoritesFragment : BaseFragment<FragmentFavoritesBinding>(
             viewModel.favorites.collect { response ->
                 when (response) {
                     is ViewState.Loading -> {
+                        Log.d("Loading", "Loading")
                     }
 
                     is ViewState.Success -> {
@@ -62,6 +58,7 @@ class FavoritesFragment : BaseFragment<FragmentFavoritesBinding>(
                     }
 
                     is ViewState.Error -> {
+                        requireContext().showToast(response.error)
                     }
                 }
             }

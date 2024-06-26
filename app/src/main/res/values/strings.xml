@@ -13,4 +13,15 @@
     <string name="orders">Orders</string>
     <string name="cancel">Cancel</string>
     <string name="track">Track</string>
+    <string name="deliver_to">Deliver to:</string>
+    <string name="my_cart">My Cart</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="name">Name</string>
+    <string name="email">Email</string>
+    <string name="username">Username</string>
+    <string name="save_changes">Save Changes</string>
+    <string name="logout">Logout</string>
+    <string name="password">Password</string>
+    <string name="login_with_username">Login with Username</string>
+    <string name="login">Login</string>
 </resources>
